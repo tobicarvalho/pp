@@ -84,7 +84,7 @@ class lane_controller(object):
         x_yellow=0
         y_white=0
         y_yellow=0
-        L=0.1
+        L=0.5
 #         rospy.loginfo(seg_list)
         for line in seg_list.segments:
             mean_x  =(line.points[0].x+line.points[1].x)/2
@@ -106,10 +106,10 @@ class lane_controller(object):
 
         if n_yellow>0:
             x_mean=(x_yellow/n_yellow)
-            y_mean=(y_yellow/n_yellow)-0.15
+            y_mean=(y_yellow/n_yellow)-0.1
         elif n_white>0:
             x_mean=(x_white/n_white)
-            y_mean=(y_white/n_white)+0.15
+            y_mean=(y_white/n_white)+0.1
         else:
             x_mean=0
             y_mean=0.05
