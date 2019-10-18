@@ -106,10 +106,10 @@ class lane_controller(object):
 
         if n_yellow>0:
             x_mean=(x_yellow/n_yellow)
-            y_mean=(y_yellow/n_yellow)-0.1
+            y_mean=(y_yellow/n_yellow)-0.2
         elif n_white>0:
             x_mean=(x_white/n_white)
-            y_mean=(y_white/n_white)+0.1
+            y_mean=(y_white/n_white)+0.2
         else:
             x_mean=0
             y_mean=0.05
@@ -118,6 +118,8 @@ class lane_controller(object):
         
         alpha=np.arctan2(y_mean,x_mean)
         lookup_distance = (x_mean**2+y_mean**2)**0.5
+        if lookup_distance<L:
+            lookup_distance=L
         
 #         if car_control_msg.v > self.actuator_limits.v:
 #             car_control_msg.v = self.actuator_limits.v
