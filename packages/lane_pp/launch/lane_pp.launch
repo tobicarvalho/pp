@@ -1,0 +1,53 @@
+<launch>
+	<arg name="veh" default="$(env VEHICLE_NAME)"/>
+	<arg name="ai_trafo_mode" default="cb" doc="'cb' for colo balance only; 'both' for color balance and linear trafo"/>
+	<arg name="ai_interval" default="5" doc="interval with which the linear trafo gets updated. color balance is performed every second."/>
+	<arg name="verbose" default="false"/>
+	<arg name="pkg_name" value="pp"/>
+	<arg name="node_name" default="pp_node"/>
+
+	<!-- start basic args -->
+	<include file="$(find duckietown_demos)/launch/master.launch">
+		<arg name="veh" value="$(arg veh)"/>
+		<arg name="visualization" default="true" />
+		<!--arg name="verbose" value="$(arg verbose)" /-->
+    		<arg name="/camera/raw" default="true" />
+		<arg name="param_file_name" default="default" />
+		<arg name="line_detector_param_file_name" default="default" />
+		<arg name="anti_instagram" default="true" />
+		<arg name="ai_trafo_mode" value="$(arg ai_trafo_mode)"/>
+		<arg name="ai_interval" value="$(arg ai_interval)"/>
+		<arg name="/lane_following/stop_line_filter" default="false" /> <!-- will not every allow a transition into COORDINATION mode -->
+		<arg name="vehicle_avoidance" default="false"/>
+		<arg name="/lane_following/lane_controller" default="false"/>
+	</include>
+
+
+	<group>
+
+		<remap from="lane_pp_node/lane_pose" to="lane_filter_node/lane_pose"/>
+		<remap from="lane_pp_node/seglist_filtered" to="lane_filter_node/seglist_filtered"/>
+		<remap from="lane_pp_node/lineseglist_out" to="ground_projection/lineseglist_out"/>
+		<remap from="lane_pp_node/wheels_cmd_executed" to="wheels_driver_node/wheels_cmd_executed" />
+		<remap from="lane_pp_node/fsm_mode" to="fsm_node/mode" />
+		<remap from="lane_pp_node/obstacle_avoidance_pose" to="obst_avoid/obstacle_avoidance_pose" />
+		<remap from="lane_pp_node/obstacle_detected" to="obstacle_avoidance_node/obstacle_avoidance_active_flag" />
+		<remap from="lane_pp_node/stop_line_reading" to="stop_line_filter_node/stop_line_reading" />
+		<remap from="wheels_driver_node/radius_limit" to="lane_pp_node/radius_limit" />
+
+		<remap from="lane_pp_node/actuator_limits" to="lane_controller_node/actuator_limits" />
+		<remap from="lane_pp_node/actuator_limits_received" to="lane_controller_node/actuator_limits_received" />       
+		<remap from="lane_pp_node/car_cmd" to="joy_mapper_node/car_cmd" />
+		<remap from="lane_pp_node/intersection_navigation_pose" to="lane_controller_node/intersection_navigation_pose" />
+		<remap from="lane_pp_node/switch" to="lane_controller_node/switch" />
+
+
+
+
+		<include file="$(find lane_pp)/launch/lane_pp_node.launch">
+			<arg name="veh" value="$(arg veh)"/>
+			<arg name="param_file_name" value="default"/>
+		</include>	        
+
+        </group>
+</launch>
