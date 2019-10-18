@@ -103,37 +103,16 @@ class lane_controller(object):
                     y_yellow+=factor*mean_y
                     n_yellow+=factor
     #                 rospy.loginfo(line)
-        f_cor=1
-        if n_white==0 and n_yellow==0:
-            x_mean=0.15
-            y_mean=0
-            f_cor=1
-        elif n_white==0:
-            x_mean=(x_yellow/n_yellow)
-            y_mean=(y_yellow/n_yellow)+0.10
-            if np.arctan2(y_mean,x_mean)>0:
-                f_cor=2
-            elif np.arctan2(y_mean,x_mean)<0:
-                f_cor=0.5
 
-        elif n_yellow==0:
+        if n_yellow>0:
+            x_mean=(x_yellow/n_yellow)
+            y_mean=(y_yellow/n_yellow)-0.15
+        elif n_white>0:
             x_mean=(x_white/n_white)
-            y_mean=(y_white/n_white)-0.10
-            if np.arctan2(y_mean,x_mean)>0:
-                f_cor=0.5
-            elif np.arctan2(y_mean,x_mean)<0:
-                f_cor=2
+            y_mean=(y_white/n_white)+0.15
         else:
-            y_yellow=y_yellow/n_yellow
-            y_white =y_white/n_white
-#             x_mean=(x_white/n_white+x_yellow/n_yellow)/2
-#             y_mean=(y_white+y_yellow)/2
-            if y_yellow>y_white:
-                x_mean=(x_yellow/n_yellow)
-                y_mean=(y_yellow)
-            else:
-                x_mean=(x_white/n_white+x_yellow/n_yellow)/2
-                y_mean=(y_white+y_yellow)/2
+            x_mean=0
+            y_mean=0.05
 
                    
         
@@ -144,7 +123,7 @@ class lane_controller(object):
 #             car_control_msg.v = self.actuator_limits.v
         
 #         omega=f_cor*2*self.v_bar*np.sin(alpha)/lookup_distance
-        v=0.1
+        v=0.5
         omega=2*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
         car_control_msg.v=v
         
