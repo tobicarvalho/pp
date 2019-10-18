@@ -77,7 +77,7 @@ class lane_controller(object):
         self.stop_line_detected = False
         
     def error_reader(self, pose_msg):
-        self.timestamp_err = rospy.Time.now()
+        self.timestamp_err = rospy.Time.now().secs
         self.cross_track_err = pose_msg.d - self.d_offset
         self.heading_err = pose_msg.phi
 
@@ -144,7 +144,7 @@ class lane_controller(object):
         car_control_msg.omega = omega
 #         rospy.loginfo(car_control_msg)
 #         rospy.loginfo(car_control_msg)
-        rospy.loginfo("DATA\t%f\t%f\t%f\t%f\t%f\t%f" % (rospy.Time.now(), v, omega, self.timestamp_err, self.cross_track_err, self.heading_err))
+        rospy.loginfo("DATA\t%f\t%f\t%f\t%f\t%f\t%f" % (rospy.Time.now().secs, v, omega, self.timestamp_err, self.cross_track_err, self.heading_err))
         self.publishCmd(car_control_msg)
         
         
