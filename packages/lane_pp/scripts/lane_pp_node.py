@@ -39,7 +39,7 @@ class lane_controller(object):
         self.sub_lane_reading = rospy.Subscriber("~seglist_filtered", SegmentList, self.PurePursuit, queue_size=1)
         #/default/lane_filter_node/seglist_filtered
         #/default/ground_projection/lineseglist_out
-        self.sub_error_reading = rospy.Subscriber("~lane_pose", LanePose, self.error_reader, "lane_filter", queue_size=1)
+        self.sub_error_reading = rospy.Subscriber("~lane_pose", LanePose, self.error_reader, queue_size=1)
 
         self.sub_obstacle_avoidance_pose = rospy.Subscriber("~obstacle_avoidance_pose", LanePose, self.PoseHandling, "obstacle_avoidance",queue_size=1)
         self.sub_obstacle_detected = rospy.Subscriber("~obstacle_detected", BoolStamped, self.setFlag, "obstacle_detected", queue_size=1)
@@ -144,9 +144,6 @@ class lane_controller(object):
         car_control_msg.omega = omega
 #         rospy.loginfo(car_control_msg)
 #         rospy.loginfo(car_control_msg)
-        self.timestamp_err = rospy.Time.now()
-        self.cross_track_err = pose_msg.d - self.d_offset
-        self.heading_err = pose_msg.phi
         rospy.loginfo("DATA\t%f\t%f\t%f\t%f\t%f\t%f" % (rospy.Time.now(), v, omega, self.timestamp_err, self.cross_track_err, self.heading_err))
         self.publishCmd(car_control_msg)
         
