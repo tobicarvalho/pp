@@ -29,7 +29,7 @@ class lane_controller(object):
         
         # TODO-TAL this is just to acknowledge receiving a msg... We should remove it... (or replace this and the corresponding subscriber with a service)
         self.pub_actuator_limits_received = rospy.Publisher("~actuator_limits_received", BoolStamped, queue_size=1)
-        
+
         self.pub_radius_limit = rospy.Publisher("~radius_limit", BoolStamped, queue_size=1)
 
 
@@ -39,6 +39,7 @@ class lane_controller(object):
         self.sub_lane_reading = rospy.Subscriber("~seglist_filtered", SegmentList, self.PurePursuit, queue_size=1)
         #/default/lane_filter_node/seglist_filtered
         #/default/ground_projection/lineseglist_out
+        self.sub_error_reading = rospy.Subscriber("~lane_pose", LanePose, self.error_reader, "lane_filter", queue_size=1)
 
         self.sub_obstacle_avoidance_pose = rospy.Subscriber("~obstacle_avoidance_pose", LanePose, self.PoseHandling, "obstacle_avoidance",queue_size=1)
         self.sub_obstacle_detected = rospy.Subscriber("~obstacle_detected", BoolStamped, self.setFlag, "obstacle_detected", queue_size=1)
@@ -75,7 +76,11 @@ class lane_controller(object):
         self.stop_line_distance = 999
         self.stop_line_detected = False
         
-        
+    def error_reader(self, pose_msg):
+        self.timestamp_err = rospy.Time.now()
+        self.cross_track_err = pose_msg.d - self.d_offset
+        self.heading_err = pose_msg.phi
+
     def PurePursuit(self, seg_list):
         car_control_msg = Twist2DStamped()
         n_white=0
@@ -84,7 +89,7 @@ class lane_controller(object):
         x_yellow=0
         y_white=0
         y_yellow=0
-        L=0.5
+        L=0.3
 #         rospy.loginfo(seg_list)
         for line in seg_list.segments:
             mean_x  =(line.points[0].x+line.points[1].x)/2
@@ -106,10 +111,10 @@ class lane_controller(object):
 
         if n_yellow>0:
             x_mean=(x_yellow/n_yellow)
-            y_mean=(y_yellow/n_yellow)-0.2
+            y_mean=(y_yellow/n_yellow)-0.15
         elif n_white>0:
             x_mean=(x_white/n_white)
-            y_mean=(y_white/n_white)+0.2
+            y_mean=(y_white/n_white)+0.15
         else:
             x_mean=0
             y_mean=0.05
@@ -125,7 +130,8 @@ class lane_controller(object):
 #             car_control_msg.v = self.actuator_limits.v
         
 #         omega=f_cor*2*self.v_bar*np.sin(alpha)/lookup_distance
-        v=0.3
+        v=(lookup_distance/L)*0.2
+
         omega=2*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
         car_control_msg.v=v
         
@@ -138,6 +144,10 @@ class lane_controller(object):
         car_control_msg.omega = omega
 #         rospy.loginfo(car_control_msg)
 #         rospy.loginfo(car_control_msg)
+        self.timestamp_err = rospy.Time.now()
+        self.cross_track_err = pose_msg.d - self.d_offset
+        self.heading_err = pose_msg.phi
+        rospy.loginfo("DATA\t%f\t%f\t%f\t%f\t%f\t%f" % (rospy.Time.now(), v, omega, self.timestamp_err, self.cross_track_err, self.heading_err))
         self.publishCmd(car_control_msg)
         
         
@@ -228,6 +238,7 @@ class lane_controller(object):
         self.phi_ref = self.setupParameter("~phi_ref",0)
         self.object_detected = self.setupParameter("~object_detected", 0)
         self.v_ref_possible["default"] = self.v_max
+
 
 
     def getGains_event(self, event):
