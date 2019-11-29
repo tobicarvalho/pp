@@ -128,7 +128,7 @@ class lane_controller(object):
 
         v=(lookup_distance/L)*0.35
 
-        omega=1.5*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
+        omega=1*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
         car_control_msg.v=v
         
 #         apply magic conversion factors
