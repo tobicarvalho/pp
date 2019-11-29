@@ -89,9 +89,59 @@ class lane_controller(object):
         x_yellow=0
         y_white=0
         y_yellow=0
+
         L=0.3
+
+
+        x_w1=0
+        x_w2=0
+        y_w1=0
+        y_w2=0
+
+        x_y1=0
+        x_y2=0
+        y_y1=0
+        y_y2=0
 #         rospy.loginfo(seg_list)
+#         for line in seg_list.segments:
+#             mean_x  =(line.points[0].x+line.points[1].x)/2
+#             mean_y  =(line.points[0].y+line.points[1].y)/2
+#             d       =(mean_x**2+mean_y**2)**0.5
+#             factor  =1/(1+np.abs(d-L)**2)
+#             # if d<10*L:
+#     #             rospy.loginfo(line.color == line.YELLOW)
+#             if line.color == line.WHITE:
+#                 x_white+=factor*mean_x
+#                 y_white+=factor*mean_y
+#                 n_white+=factor
+# #                 rospy.loginfo(line)
+#             elif line.color == line.YELLOW:
+#                 x_yellow+=factor*mean_x
+#                 y_yellow+=factor*mean_y
+#                 n_yellow+=factor
+# #                 rospy.loginfo(line)
+
+#         if n_yellow>0:
+#             x_mean=(x_yellow/n_yellow)
+#             y_mean=(y_yellow/n_yellow)-0.15
+#         elif n_white>0:
+#             x_mean=(x_white/n_white)
+#             y_mean=(y_white/n_white)+0.15
+#         else:
+#             x_mean=0
+#             y_mean=0.05
+
+
         for line in seg_list.segments:
+
+            if np.linalg.norm([line.points[1].x, line.points[1].y])<np.linalg.norm([line.points[0].x, line.points[0].y]):
+                p1=line.points[1]
+                p2=line.points[0]
+            else:
+                p1=line.points[0]
+                p2=line.points[1]
+
+
             mean_x  =(line.points[0].x+line.points[1].x)/2
             mean_y  =(line.points[0].y+line.points[1].y)/2
             d       =(mean_x**2+mean_y**2)**0.5
@@ -99,25 +149,54 @@ class lane_controller(object):
             # if d<10*L:
     #             rospy.loginfo(line.color == line.YELLOW)
             if line.color == line.WHITE:
-                x_white+=factor*mean_x
-                y_white+=factor*mean_y
+                x_w1+=factor*p1.x
+                x_w2+=factor*p2.x
+
+                y_w1+=factor*p1.y
+                y_w2+=factor*p2.y
+
                 n_white+=factor
 #                 rospy.loginfo(line)
             elif line.color == line.YELLOW:
-                x_yellow+=factor*mean_x
-                y_yellow+=factor*mean_y
+                x_y1+=factor*p1.x
+                x_y2+=factor*p2.x
+
+                y_y1+=factor*p1.y
+                y_y2+=factor*p2.y
+
                 n_yellow+=factor
 #                 rospy.loginfo(line)
 
         if n_yellow>0:
-            x_mean=(x_yellow/n_yellow)
-            y_mean=(y_yellow/n_yellow)-0.15
+            xm1 = (x_y1/n_yellow)
+            xm2 = (x_y2/n_yellow)
+            
+            ym1 = (y_y1/n_yellow)
+            ym2 = (y_y2/n_yellow)
+
+            line_vec = np.matmul(np.array([xm2-xm1, ym2-ym1]), np.array([[0, -1], [1, 0]]))
+            # print(line_vec)
+            line_vec = 0.15*line_vec/np.linalg.norm(line_vec)
+
+            x_mean = (xm1+xm2)/2 + line_vec[0]
+            y_mean = (ym1+ym2)/2 + line_vec[1]
+
         elif n_white>0:
-            x_mean=(x_white/n_white)
-            y_mean=(y_white/n_white)+0.15
+            xm1 = (x_w1/n_white)
+            xm2 = (x_w2/n_white)
+            
+            ym1 = (y_w1/n_white)
+            ym2 = (y_w2/n_white)
+
+            line_vec = np.matmul(np.array([xm2-xm1, ym2-ym1]), np.array([[0, 1], [-1, 0]]))
+            # print(line_vec)
+            line_vec = 0.15*line_vec/np.linalg.norm(line_vec)
+
+            x_mean = (xm1+xm2)/2 + line_vec[0]
+            y_mean = (ym1+ym2)/2 + line_vec[1]
         else:
             x_mean=0
-            y_mean=0.05
+            y_mean=0
 
                    
         
@@ -125,11 +204,7 @@ class lane_controller(object):
         lookup_distance = (x_mean**2+y_mean**2)**0.5
         if lookup_distance<L:
             lookup_distance=L
-        # lookup_distance = max(lookup_distance, L)
-#         if car_control_msg.v > self.actuator_limits.v:
-#             car_control_msg.v = self.actuator_limits.v
-        
-#         omega=f_cor*2*self.v_bar*np.sin(alpha)/lookup_distance
+
         v=(lookup_distance/L)*0.25
 
         omega=2*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
