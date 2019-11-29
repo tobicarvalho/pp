@@ -123,9 +123,9 @@ class lane_controller(object):
         
         alpha=np.arctan2(y_mean,x_mean)
         lookup_distance = (x_mean**2+y_mean**2)**0.5
-        # if lookup_distance<L:
-        #     lookup_distance=L
-        lookup_distance = max(lookup_distance, L)
+        if lookup_distance<L:
+            lookup_distance=L
+        # lookup_distance = max(lookup_distance, L)
 #         if car_control_msg.v > self.actuator_limits.v:
 #             car_control_msg.v = self.actuator_limits.v
         
