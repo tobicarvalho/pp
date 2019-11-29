@@ -14,6 +14,7 @@ class lane_controller(object):
         self.lane_reading = None
         self.last_ms = None
         self.pub_counter = 0
+        self.cmd_counter = 0
 
         # TODO-TAL weird double initialisation
         self.velocity_to_m_per_s = 0.67
@@ -90,6 +91,8 @@ class lane_controller(object):
         y_white=0
         y_yellow=0
         L=0.3
+        if self.cmd_counter<5:
+            self.cmd_counter+=1
 #         rospy.loginfo(seg_list)
         for line in seg_list.segments:
             mean_x  =(line.points[0].x+line.points[1].x)/2
@@ -126,9 +129,9 @@ class lane_controller(object):
         if lookup_distance<L/2:
             lookup_distance=L/2
 
-        v=(lookup_distance/L)*0.3
+        v=(lookup_distance/L)*self.cmd_counter*0.06
 
-        omega=2*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
+        omega=1.7*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
         car_control_msg.v=v
         
 #         apply magic conversion factors
