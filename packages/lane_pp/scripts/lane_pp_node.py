@@ -129,9 +129,9 @@ class lane_controller(object):
         if lookup_distance<L/2:
             lookup_distance=L/2
 
-        v=(lookup_distance/L)*self.cmd_counter*0.06
+        v=(lookup_distance/L)*self.cmd_counter*0.05
 
-        omega=1.7*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
+        omega=2*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
         car_control_msg.v=v
         
 #         apply magic conversion factors
