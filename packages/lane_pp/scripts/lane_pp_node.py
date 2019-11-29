@@ -96,18 +96,18 @@ class lane_controller(object):
             mean_y  =(line.points[0].y+line.points[1].y)/2
             d       =(mean_x**2+mean_y**2)**0.5
             factor  =1/(1+np.abs(d-L)**2)
-            if d<10*L:
+            # if d<10*L:
     #             rospy.loginfo(line.color == line.YELLOW)
-                if line.color == line.WHITE:
-                    x_white+=factor*mean_x
-                    y_white+=factor*mean_y
-                    n_white+=factor
-    #                 rospy.loginfo(line)
-                elif line.color == line.YELLOW:
-                    x_yellow+=factor*mean_x
-                    y_yellow+=factor*mean_y
-                    n_yellow+=factor
-    #                 rospy.loginfo(line)
+            if line.color == line.WHITE:
+                x_white+=factor*mean_x
+                y_white+=factor*mean_y
+                n_white+=factor
+#                 rospy.loginfo(line)
+            elif line.color == line.YELLOW:
+                x_yellow+=factor*mean_x
+                y_yellow+=factor*mean_y
+                n_yellow+=factor
+#                 rospy.loginfo(line)
 
         if n_yellow>0:
             x_mean=(x_yellow/n_yellow)
