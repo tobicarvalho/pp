@@ -142,10 +142,10 @@ class lane_controller(object):
         
         if n_yellow > 0:
             x_mean=(x_yellow/n_yellow)
-            y_mean=(y_yellow/n_yellow)-0.12
+            y_mean=(y_yellow/n_yellow)-0.15
         elif n_white > 0:
             x_mean=(x_white/n_white)
-            y_mean=(y_white/n_white)+0.12
+            y_mean=(y_white/n_white)+0.15
         else:
             x_mean = 0.05
             y_mean = 0
