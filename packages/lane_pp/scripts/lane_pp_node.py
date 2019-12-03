@@ -43,7 +43,7 @@ class lane_controller(object):
 
 
         # Subscriptions
-        self.sub_lane = rospy.Subscriber("~lineseglist_out", SegmentList, self.line_stats, queue_size=1)
+        # self.sub_lane = rospy.Subscriber("~lineseglist_out", SegmentList, self.line_stats, queue_size=1)
 
         self.sub_lane_reading = rospy.Subscriber("~seglist_filtered", SegmentList, self.PurePursuit, queue_size=1)
         #/default/lane_filter_node/seglist_filtered
@@ -119,6 +119,7 @@ class lane_controller(object):
         # y_y2=0
         # list_x = []
         # rospy.loginfo(seg_list)
+        self.line_stats(seg_list)
         for line in seg_list.segments:
             mean_x  =(line.points[0].x+line.points[1].x)/2
             mean_y  =(line.points[0].y+line.points[1].y)/2
