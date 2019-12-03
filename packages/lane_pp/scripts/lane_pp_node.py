@@ -229,8 +229,8 @@ class lane_controller(object):
 
         # lookup_distance = max(lookup_distance, 2*L/3)
         
-        if lookup_distance < L:
-            lookup_distance = L
+        if lookup_distance < 0.87 * L:
+            lookup_distance = 0.87 * L
 
         
 #         if car_control_msg.v > self.actuator_limits.v:
