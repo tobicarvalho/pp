@@ -90,9 +90,9 @@ class lane_controller(object):
         x_yellow=0
         y_white=0
         y_yellow=0
-        L=0.3
-        if self.cmd_counter<5:
-            self.cmd_counter+=1
+        L=0.4
+        # if self.cmd_counter<5:
+        #     self.cmd_counter+=1
 #         rospy.loginfo(seg_list)
         for line in seg_list.segments:
             mean_x  =(line.points[0].x+line.points[1].x)/2
@@ -114,10 +114,10 @@ class lane_controller(object):
 
         if n_yellow>0:
             x_mean=(x_yellow/n_yellow)
-            y_mean=(y_yellow/n_yellow)-0.15
+            y_mean=(y_yellow/n_yellow)-0.12
         elif n_white>0:
             x_mean=(x_white/n_white)
-            y_mean=(y_white/n_white)+0.15
+            y_mean=(y_white/n_white)+0.12
         else:
             x_mean=0
             y_mean=0.05
@@ -126,10 +126,10 @@ class lane_controller(object):
         
         alpha=np.arctan2(y_mean,x_mean)
         lookup_distance = (x_mean**2+y_mean**2)**0.5
-        if lookup_distance<L/2:
-            lookup_distance=L/2
+        if lookup_distance<L:
+            lookup_distance=L
 
-        v=(lookup_distance/L)*self.cmd_counter*0.05
+        v=(lookup_distance/L)*0.45 #self.cmd_counter*0.05
 
         omega=2*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
         car_control_msg.v=v
@@ -143,7 +143,7 @@ class lane_controller(object):
         car_control_msg.omega = omega
 #         rospy.loginfo(car_control_msg)
 #         rospy.loginfo(car_control_msg)
-        rospy.loginfo("DATA\t%f\t%f\t%f\t%f\t%f\t%f" % (rospy.Time.now().secs, v, omega, self.timestamp_err, self.cross_track_err, self.heading_err))
+        # rospy.loginfo("DATA\t%f\t%f\t%f\t%f\t%f\t%f" % (rospy.Time.now().secs, v, omega, self.timestamp_err, self.cross_track_err, self.heading_err))
         self.publishCmd(car_control_msg)
         
         
