@@ -237,9 +237,9 @@ class lane_controller(object):
 #             car_control_msg.v = self.actuator_limits.v
         
 #         omega=f_cor*2*self.v_bar*np.sin(alpha)/lookup_distance
-        v=(lookup_distance/L)*0.35
+        v=(lookup_distance/L)*0.25
 
-        omega=2*np.sin(alpha)/(lookup_distance+np.exp(-6))
+        omega=2*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
         car_control_msg.v=v
 
 #         apply magic conversion factors
