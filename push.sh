@@ -7,7 +7,7 @@ then
 fi
 
 git add packages/lane_pp/scripts/lane_pp_node.py
-git commit -m $1
+git commit -m "$1"
 git push
 dts devel build --push -u tobic
 
