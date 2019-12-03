@@ -119,24 +119,24 @@ class lane_controller(object):
         # y_y2=0
         # list_x = []
         # rospy.loginfo(seg_list)
-        self.line_stats(seg_list)
+        # self.line_stats(seg_list)
         for line in seg_list.segments:
             mean_x  =(line.points[0].x+line.points[1].x)/2
             mean_y  =(line.points[0].y+line.points[1].y)/2
             d       =(mean_x**2+mean_y**2)**0.5
             factor  =1/(1+np.abs(d-L)**2)
             # list_x.append(mean_x)
-            # if d<10*L:
+            if d<10*L:
     #             rospy.loginfo(line.color == line.YELLOW)
-            if line.color == line.WHITE:
-                x_white+=factor*mean_x
-                y_white+=factor*mean_y
-                n_white+=factor
-#                 rospy.loginfo(line)
-            elif line.color == line.YELLOW:
-                x_yellow+=factor*mean_x
-                y_yellow+=factor*mean_y
-                n_yellow+=factor
+                if line.color == line.WHITE:
+                    x_white+=factor*mean_x
+                    y_white+=factor*mean_y
+                    n_white+=factor
+    #                 rospy.loginfo(line)
+                elif line.color == line.YELLOW:
+                    x_yellow+=factor*mean_x
+                    y_yellow+=factor*mean_y
+                    n_yellow+=factor
 #                 rospy.loginfo(line)
         
         
@@ -150,10 +150,10 @@ class lane_controller(object):
             x_mean = 0.05
             y_mean = 0
         
-        coeff = (np.mean(self.std_y)/np.mean(self.std_x)-0.95)**2
-        rospy.loginfo('std_x {}'.format(np.mean(self.std_x)))
-        rospy.loginfo('std_y {}'.format(np.mean(self.std_y)))
-        rospy.loginfo('ratio {}'.format(coeff))
+        # coeff = (np.mean(self.std_y)/np.mean(self.std_x)-0.95)**2
+        # rospy.loginfo('std_x {}'.format(np.mean(self.std_x)))
+        # rospy.loginfo('std_y {}'.format(np.mean(self.std_y)))
+        # rospy.loginfo('ratio {}'.format(coeff))
 #         for line in seg_list.segments:
 
 #             if np.linalg.norm([line.points[1].x, line.points[1].y])<np.linalg.norm([line.points[0].x, line.points[0].y]):
@@ -229,17 +229,17 @@ class lane_controller(object):
 
         # lookup_distance = max(lookup_distance, 2*L/3)
         
-        if lookup_distance<0.7 * L:
-            lookup_distance=0.7 * L
+        if lookup_distance < L:
+            lookup_distance = L
 
         
 #         if car_control_msg.v > self.actuator_limits.v:
 #             car_control_msg.v = self.actuator_limits.v
         
 #         omega=f_cor*2*self.v_bar*np.sin(alpha)/lookup_distance
-        v=(lookup_distance/L)*0.25
+        v=(lookup_distance/L)*0.28
 
-        omega=2*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
+        omega=1.7*v*np.sin(alpha)/(lookup_distance+np.exp(-6))
         car_control_msg.v=v
 
 #         apply magic conversion factors
