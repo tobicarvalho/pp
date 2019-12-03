@@ -140,26 +140,15 @@ class lane_controller(object):
 #                 rospy.loginfo(line)
         
         
-        if n_yellow>0 and n_white>0:
-            if (y_white/n_white) > (y_yellow/n_yellow):
-                x_mean=(x_yellow/n_yellow)
-                y_mean=(y_yellow/n_yellow)-0.1
-            else:
-                x_mean = ((x_yellow/n_yellow) + (x_white/n_white))/2
-                y_mean = ((y_yellow/n_yellow) + (y_white/n_white))/2
-        elif n_yellow == 0 and n_white == 0:
-            x_mean = 0.05
-            y_mean = 0      
-        elif n_white==0:
+        if n_yellow > 0:
             x_mean=(x_yellow/n_yellow)
             y_mean=(y_yellow/n_yellow)-0.12
-        elif n_yellow==0:
-            # if y_white < 0:
-            #   x_mean=(x_white/n_white)
-            #   y_mean=(y_white/n_white) - 0.30  
-            # else:
+        elif n_white > 0:
             x_mean=(x_white/n_white)
             y_mean=(y_white/n_white)+0.12
+        else:
+            x_mean = 0.05
+            y_mean = 0
         
         coeff = (np.mean(self.std_y)/np.mean(self.std_x)-0.95)**2
         rospy.loginfo('std_x {}'.format(np.mean(self.std_x)))
